@@ -15,6 +15,7 @@ const fragmentShader = /* glsl */ `
 
   uniform float uTime;
   uniform vec2 uResolution;
+  uniform vec2 uPointer;
   varying vec2 vUv;
 
   float hash21(vec2 p) {
@@ -51,30 +52,76 @@ const fragmentShader = /* glsl */ `
 
   void main() {
     vec2 p = (gl_FragCoord.xy - 0.5 * uResolution.xy) / min(uResolution.x, uResolution.y);
-    float time = uTime * 0.045;
+    float time = uTime * 0.55;
 
-    vec2 warp = vec2(
-      fbm(p * 1.25 + vec2(time * 0.7, -time * 0.35)),
-      fbm(p * 1.35 + vec2(-time * 0.45, time * 0.6))
-    );
-    vec2 cloth = p + (warp - 0.5) * 0.72;
+    float cells = 30.0;
+    vec2 mosaic = p * cells;
+    vec2 cell = floor(mosaic);
+    vec2 local = fract(mosaic);
+    vec2 center = (cell + 0.5) / cells;
 
-    float foldA = sin(cloth.x * 3.8 + cloth.y * 5.4 + fbm(cloth * 2.1 + time) * 3.4 + time * 1.4);
-    float foldB = sin(cloth.x * 7.2 - cloth.y * 3.1 + fbm(cloth * 3.2 - time) * 2.6 - time * 0.8);
-    float silk = smoothstep(0.52, 0.96, 0.5 + 0.5 * (foldA * 0.72 + foldB * 0.28));
-    float lavenderFold = smoothstep(0.65, 0.98, 0.5 + 0.5 * sin(cloth.x * 2.7 - cloth.y * 6.2 + fbm(cloth * 2.8) * 3.0 - time));
+    float pixelMask =
+      step(0.08, local.x) * step(local.x, 0.92) *
+      step(0.08, local.y) * step(local.y, 0.92);
 
-    vec3 charcoal = vec3(0.0431, 0.0431, 0.0471);
-    vec3 silver = vec3(0.78, 0.79, 0.8);
-    vec3 lavender = vec3(0.72, 0.67, 0.9);
+    vec2 drift = vec2(time * 0.12, cos(time * 0.4) * 0.08);
+    float n = fbm(center * 2.6 + drift);
+    float wave = 0.5 + 0.5 * sin(center.x * 7.0 - center.y * 5.0 + n * 6.0 + time * 1.8);
+    float pulse = smoothstep(0.35, 1.0, wave);
 
-    float vignette = 1.0 - smoothstep(0.48, 1.28, length(p * vec2(0.82, 0.92)));
-    float silverStrength = silk * (0.18 + 0.18 * vignette);
-    float lavenderStrength = lavenderFold * (0.12 + 0.16 * vignette);
+    float intensity = (0.25 + n * 0.5) * (0.35 + pulse * 0.85);
+    float sparkle = step(0.92, hash21(cell + vec2(floor(time * 3.0))));
+    intensity += sparkle * 0.5;
+
+    float radius = length(p);
+    float angle = atan(p.y, p.x);
+
+    float ringA = smoothstep(0.009, 0.0, abs(radius - (0.66 + 0.02 * sin(angle * 3.0 + time * 0.8))));
+    float ringB = smoothstep(0.007, 0.0, abs(radius - (0.98 + 0.015 * cos(angle * 4.0 - time * 0.6))));
+    float ringC = smoothstep(0.006, 0.0, abs(radius - (0.4 + 0.012 * sin(angle * 2.0 - time))));
+
+    float dashA = 0.4 + 0.6 * step(0.0, sin(angle * 16.0 + time * 2.2));
+    float dashB = 0.3 + 0.7 * step(0.0, sin(angle * 22.0 - time * 1.6));
+
+    float orbits = ringA * dashA * 0.85 + ringB * dashB * 0.5 + ringC * 0.35;
+
+    float angleOne = time * 1.1;
+    vec2 dotOne = vec2(cos(angleOne), sin(angleOne)) * (0.66 + 0.02 * sin(angleOne * 3.0));
+    float glowOne = smoothstep(0.05, 0.0, length(p - dotOne));
+
+    float angleTwo = -time * 0.7 + 2.2;
+    vec2 dotTwo = vec2(cos(angleTwo), sin(angleTwo)) * (0.98 + 0.015 * cos(angleTwo * 4.0));
+    float glowTwo = smoothstep(0.032, 0.0, length(p - dotTwo));
+
+    float angleThree = time * 1.6 + 4.0;
+    vec2 dotThree = vec2(cos(angleThree), sin(angleThree)) * 0.4;
+    float glowThree = smoothstep(0.024, 0.0, length(p - dotThree));
+
+    vec2 pointer = uPointer * 0.55;
+    float pointerGlow = smoothstep(0.55, 0.0, length(p - pointer));
+
+    vec3 charcoal = vec3(0.022, 0.021, 0.019);
+    vec3 espresso = vec3(0.17, 0.13, 0.10);
+    vec3 bronze = vec3(0.48, 0.34, 0.22);
+    vec3 sand = vec3(0.79, 0.66, 0.49);
+    vec3 ivory = vec3(0.90, 0.90, 0.87);
+
+    vec3 pixelColor = mix(espresso, sand, n);
 
     vec3 color = charcoal;
-    color += silver * silverStrength;
-    color += lavender * lavenderStrength;
+    color += pixelColor * intensity * pixelMask * 0.58;
+    color += bronze * pow(intensity, 3.0) * pixelMask * 0.26;
+    color += sand * orbits * 1.3;
+    color += ivory * (glowOne + glowTwo) * 1.3;
+    color += sand * glowThree * 1.05;
+    color += sand * pointerGlow * pixelMask * 0.42;
+    color += sand * pointerGlow * 0.1;
+
+    float grain = hash21(gl_FragCoord.xy + uTime * 24.0);
+    color += (grain - 0.5) * 0.025;
+
+    float vignette = 1.0 - smoothstep(0.55, 1.35, length(p * vec2(0.82, 0.92)));
+    color *= 0.8 + 0.5 * vignette;
 
     gl_FragColor = vec4(color, 1.0);
   }
@@ -114,7 +161,18 @@ export default function LiquidCloth({ activationClass = 'is-ready' }) {
     const uniforms = {
       uTime: { value: 0 },
       uResolution: { value: new THREE.Vector2(1, 1) },
+      uPointer: { value: new THREE.Vector2(0, 0) },
     };
+    const pointerTarget = new THREE.Vector2(0, 0);
+
+    const handlePointerMove = (event) => {
+      pointerTarget.set(
+        (event.clientX / window.innerWidth) * 2 - 1,
+        -((event.clientY / window.innerHeight) * 2 - 1),
+      );
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
     const material = new THREE.ShaderMaterial({
       uniforms,
       vertexShader,
@@ -136,6 +194,7 @@ export default function LiquidCloth({ activationClass = 'is-ready' }) {
       animationFrame = undefined;
       if (isDisposed || !isVisible()) return;
       uniforms.uTime.value = reducedMotion ? 0 : time * 0.001;
+      uniforms.uPointer.value.lerp(pointerTarget, 0.045);
       renderer.render(scene, camera);
       animationFrame = window.requestAnimationFrame(render);
     };
@@ -170,6 +229,7 @@ export default function LiquidCloth({ activationClass = 'is-ready' }) {
       resizeObserver.disconnect();
       stateObserver.disconnect();
       document.removeEventListener('visibilitychange', updatePlayback);
+      window.removeEventListener('pointermove', handlePointerMove);
       geometry.dispose();
       material.dispose();
       renderer.dispose();

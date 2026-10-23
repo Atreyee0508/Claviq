@@ -1,7 +1,4 @@
-const roots = [
-  document.querySelector('#liquid-cloth-root'),
-  document.querySelector('#brief-liquid-root'),
-].filter(Boolean);
+const roots = [document.querySelector('#liquid-cloth-root')].filter(Boolean);
 
 if (roots.length) {
   Promise.all([

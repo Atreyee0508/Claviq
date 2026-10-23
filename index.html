@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div class="intro-screen" id="introScreen" role="button" tabindex="0" aria-label="Enter CLAVIQ">
+    <div class="intro-screen" id="introScreen" aria-label="Claviq loading">
       <div class="intro-orbits" aria-hidden="true"></div>
       <div class="intro-logo">
         <span class="brand-mark" aria-hidden="true">
@@ -24,50 +24,11 @@
       </div>
     </div>
 
-    <div class="brief-screen route-page" id="briefScreen" hidden aria-hidden="true">
-      <div class="brief-liquid-root" id="brief-liquid-root" data-activation-class="is-visible" aria-hidden="true"></div>
-      <div class="route-page__inner">
-        <header class="route-header brief-header">
-          <span>CLAVIQ - WEBSITE BRIEF</span>
-          <span class="route-header__index">GUWAHATI → ORLANDO</span>
-        </header>
-
-        <main>
-          <section class="route-hero route-hero--services route-hero--brief">
-            <div>
-              <h1>Grow revenue with AI,<br />from first search to repeat sale.</h1>
-              <p class="route-intro">Claviq uses AI to help your company get found, get chosen and get chosen again. One partner across marketing, sales and retention, measured in revenue.</p>
-              <div class="route-actions">
-                <button class="route-button brief-enter" id="briefEnter" type="button">CONTINUE TO HOMEPAGE</button>
-              </div>
-            </div>
-            <div class="brief-industry-collage" aria-label="Industry collage">
-              <div class="brief-industry-row brief-industry-row--top">
-                <figure class="brief-industry-card brief-industry-card--healthcare" tabindex="0">
-                  <img src="https://images.unsplash.com/photo-1598256989800-fe5f95da9787?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Dental equipment in a treatment room" loading="lazy" decoding="async" />
-                </figure>
-                <figure class="brief-industry-card brief-industry-card--real-estate" tabindex="0">
-                  <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Modern real estate home" loading="lazy" decoding="async" />
-                </figure>
-              </div>
-              <div class="brief-industry-row brief-industry-row--bottom">
-                <figure class="brief-industry-card brief-industry-card--consumer" tabindex="0">
-                  <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Red consumer product sneaker" loading="lazy" decoding="async" />
-                </figure>
-                <figure class="brief-industry-card brief-industry-card--finance" tabindex="0">
-                  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&amp;fit=crop&amp;w=900&amp;q=85" alt="Financial analytics dashboard on a laptop" loading="lazy" decoding="async" />
-                </figure>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
-    </div>
-
     <div class="page-shell">
       <div class="ambient-glow ambient-glow--one" aria-hidden="true"></div>
       <div class="ambient-glow ambient-glow--two" aria-hidden="true"></div>
       <div class="liquid-cloth-root" id="liquid-cloth-root" aria-hidden="true"></div>
+      <div class="background-grain" aria-hidden="true"></div>
       <div class="orb-field" aria-hidden="true">
         <span class="orb orb--large" data-depth="-0.08"></span>
         <span class="orb orb--medium" data-depth="0.16"></span>
@@ -105,7 +66,7 @@
         <section class="hero" aria-labelledby="hero-title">
           <div class="hero-content" id="questionContent" aria-hidden="true">
             <h1 class="hero-title" id="hero-title">
-              <span class="hero-line hero-line--who" id="question-who">Who are we ?</span>
+              <a class="hero-line hero-line--who" id="question-who" href="#about">Who are we ?</a>
               <a class="hero-line hero-line--main holo-text" id="question-what" href="#services">WHAT WE DO?</a>
               <span class="hero-line hero-line--help" id="question-help">How can we help?</span>
             </h1>
@@ -119,24 +80,29 @@
 
       <div class="menu-area">
         <nav class="menu-panel" id="menuPanel" aria-label="Page options" hidden>
+          <a href="#home">
+            <span>HOME</span>
+            <small>00</small>
+          </a>
+          <a href="#about">
+            <span>ABOUT</span>
+            <small>01</small>
+          </a>
           <a href="#services">
             <span>SERVICES</span>
-            <small>01</small>
+            <small>02</small>
           </a>
           <a href="#industries">
             <span>INDUSTRIES</span>
-            <small>02</small>
+            <small>03</small>
           </a>
           <a href="#ai-revenue-audit">
             <span>AI REVENUE AUDIT</span>
-            <small>03</small>
-          </a>
-          <a href="#website-brief">
-            <span>WEBSITE BRIEF</span>
             <small>04</small>
           </a>
-          <a class="menu-contact" href="mailto:hello@claviq.studio">
+          <a class="menu-contact" href="#contact">
             <span>CONTACT US</span>
+            <small>05</small>
           </a>
         </nav>
 
