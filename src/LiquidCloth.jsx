@@ -100,28 +100,25 @@ const fragmentShader = /* glsl */ `
     vec2 pointer = uPointer * 0.55;
     float pointerGlow = smoothstep(0.55, 0.0, length(p - pointer));
 
-    vec3 charcoal = vec3(0.022, 0.021, 0.019);
-    vec3 espresso = vec3(0.17, 0.13, 0.10);
-    vec3 bronze = vec3(0.48, 0.34, 0.22);
-    vec3 sand = vec3(0.79, 0.66, 0.49);
-    vec3 ivory = vec3(0.90, 0.90, 0.87);
+    vec3 cyan = vec3(0.0, 0.376, 0.392);
+    vec3 deepCyan = vec3(0.0, 0.18, 0.20);
+    vec3 lightCyan = vec3(0.55, 0.92, 0.95);
+    vec3 mint = vec3(0.4, 0.749, 0.686);
+    vec3 softMint = vec3(0.588, 0.816, 0.776);
 
-    vec3 pixelColor = mix(espresso, sand, n);
-
-    vec3 color = charcoal;
-    color += pixelColor * intensity * pixelMask * 0.58;
-    color += bronze * pow(intensity, 3.0) * pixelMask * 0.26;
-    color += sand * orbits * 1.3;
-    color += ivory * (glowOne + glowTwo) * 1.3;
-    color += sand * glowThree * 1.05;
-    color += sand * pointerGlow * pixelMask * 0.42;
-    color += sand * pointerGlow * 0.1;
+    vec3 cellColor = mix(deepCyan, lightCyan, n);
+    vec3 color = mix(cyan, cellColor, clamp(intensity * pixelMask * 0.55, 0.0, 0.7));
+    color = mix(color, mint, clamp(orbits * 0.55, 0.0, 0.75));
+    color = mix(color, mint, clamp((glowOne + glowTwo) * 0.65, 0.0, 0.9));
+    color = mix(color, softMint, glowThree * 0.35);
+    color = mix(color, lightCyan, pointerGlow * pixelMask * 0.35);
+    color = mix(color, deepCyan, pointerGlow * 0.06);
 
     float grain = hash21(gl_FragCoord.xy + uTime * 24.0);
-    color += (grain - 0.5) * 0.025;
+    color += (grain - 0.5) * 0.03;
 
     float vignette = 1.0 - smoothstep(0.55, 1.35, length(p * vec2(0.82, 0.92)));
-    color *= 0.8 + 0.5 * vignette;
+    color = mix(color, deepCyan, (1.0 - vignette) * 0.18);
 
     gl_FragColor = vec4(color, 1.0);
   }

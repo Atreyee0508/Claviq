@@ -767,6 +767,61 @@ const setupServiceSlider = () => {
   update();
 };
 
+const setupAboutBackdrop = () => {
+  const backdrop = document.querySelector('[data-about-backdrop]');
+  if (!backdrop) return;
+
+  const slides = Array.from(backdrop.querySelectorAll('.about-backdrop__slide'));
+  if (slides.length < 2) return;
+
+  let index = 0;
+
+  const show = (next) => {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((slide, slideIndex) => {
+      slide.classList.toggle('is-active', slideIndex === index);
+    });
+  };
+
+  if (reducedMotionQuery.matches) {
+    show(0);
+    return;
+  }
+
+  window.setInterval(() => {
+    if (document.hidden || !document.body.classList.contains('is-about-route')) return;
+    show(index + 1);
+  }, 5600);
+};
+
+const setupHomeSlideshow = () => {
+  const slideshow = document.querySelector('[data-home-slideshow]');
+  if (!slideshow) return;
+
+  const slides = Array.from(slideshow.querySelectorAll('.home-slideshow__slide'));
+  const captions = Array.from(slideshow.querySelectorAll('.home-slideshow__caption'));
+  if (slides.length < 2) return;
+
+  let index = 0;
+
+  const show = (next) => {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((slide, slideIndex) => {
+      slide.classList.toggle('is-active', slideIndex === index);
+    });
+    captions.forEach((caption, captionIndex) => {
+      caption.classList.toggle('is-active', captionIndex === index);
+    });
+  };
+
+  if (reducedMotionQuery.matches) return;
+
+  window.setInterval(() => {
+    if (document.hidden || !routePage.hidden) return;
+    show(index + 1);
+  }, 6400);
+};
+
 let pendingSlide = 0;
 let slideLocked = false;
 const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -788,8 +843,19 @@ const renderRoute = () => {
     routePageContent.classList.remove('is-slide-out-left', 'is-slide-out-right', 'is-slide-in-right', 'is-slide-in-left');
     pendingSlide = 0;
     slideLocked = false;
+    routePage.classList.remove('is-inverted');
+    routePage.classList.remove('is-about');
+    document.body.classList.remove('is-inverted-route');
+    document.body.classList.remove('is-about-route');
     return;
   }
+
+  const isAbout = routeKey === 'about' || routeKey === 'website-brief';
+  const isInverted = isAbout || routeKey === 'ai-revenue-audit';
+  routePage.classList.toggle('is-inverted', isInverted);
+  routePage.classList.toggle('is-about', isAbout);
+  document.body.classList.toggle('is-inverted-route', isInverted);
+  document.body.classList.toggle('is-about-route', isAbout);
 
   routePageContent.classList.remove('is-slide-out-left', 'is-slide-out-right', 'is-slide-in-right', 'is-slide-in-left');
   routePageContent.innerHTML = renderer();
@@ -904,3 +970,5 @@ window.addEventListener('hashchange', () => {
 });
 
 updateParallax();
+setupAboutBackdrop();
+setupHomeSlideshow();
